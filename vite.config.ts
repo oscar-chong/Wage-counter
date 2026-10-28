@@ -1,12 +1,11 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import {defineConfig} from 'vite';
+import { defineConfig } from 'vite';
 
 export default defineConfig(() => {
-  base: '/Wage-counter/',
-  plugins: [react()],
   return {
+    base: '/Wage-counter/', // Moved inside the return block where Vite expects it
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
