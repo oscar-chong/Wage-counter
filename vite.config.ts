@@ -5,6 +5,7 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   base: '/Wage-counter/',
+  plugins: [react()],
   return {
     plugins: [react(), tailwindcss()],
     resolve: {
