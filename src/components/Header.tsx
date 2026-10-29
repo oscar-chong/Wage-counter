@@ -1,5 +1,6 @@
 import React from 'react';
 import { Download, FileText, Smartphone } from 'lucide-react';
+import { usePWAInstall } from '../hooks/usePWAInstall';
 
 interface HeaderProps {
   activeTab: string;
@@ -14,6 +15,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenExportModal,
   onOpenReportsModal,
 }) => {
+  const { isInstallable, triggerInstall } = usePWAInstall();
   return (
     <header className="sticky top-0 z-40 bg-[#0c0e15]/90 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-8 py-3.5 transition-colors">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 md:gap-8">
@@ -72,52 +74,71 @@ export const Header: React.FC<HeaderProps> = ({
         </nav>
 
         {/* Zone 3: Primary Actions */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <button
             onClick={onOpenReportsModal}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-200 bg-slate-800/90 hover:bg-slate-700 hover:text-white border border-slate-700/80 rounded-xl transition-all whitespace-nowrap active:scale-95"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs font-medium text-slate-200 bg-slate-800/90 hover:bg-slate-700 hover:text-white border border-slate-700/80 rounded-xl transition-all whitespace-nowrap active:scale-95"
             title="Generate Daily CSV / PDF Report"
           >
             <FileText className="w-3.5 h-3.5 text-blue-400" />
-            <span className="hidden sm:inline">Daily</span> Reports
+            <span className="hidden md:inline">Daily</span> <span>Reports</span>
           </button>
+
+          {isInstallable && (
+            <button
+              onClick={triggerInstall}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs font-bold text-emerald-300 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 rounded-xl transition-all whitespace-nowrap active:scale-95 cursor-pointer"
+              title="Install WageTicker as a native app on this device"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Install</span> App
+            </button>
+          )}
 
           <button
             onClick={onOpenExportModal}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-950 bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 rounded-xl transition-all shadow-md shadow-emerald-500/20 whitespace-nowrap active:scale-95"
-            title="Download iOS .ipa & Swift Project"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-2 text-xs font-semibold text-slate-950 bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 rounded-xl transition-all shadow-md shadow-emerald-500/20 whitespace-nowrap active:scale-95 cursor-pointer"
+            title="Download Android APK or iOS .IPA Package"
           >
             <Smartphone className="w-3.5 h-3.5" />
-            <span>.IPA / Widget Code</span>
+            <span><span className="hidden sm:inline">Get </span>APK / .IPA</span>
           </button>
         </div>
       </div>
 
       {/* Mobile Tab bar row */}
-      <div className="flex md:hidden items-center justify-around gap-1 mt-2.5 pt-2 border-t border-slate-800/60 overflow-x-auto text-[11px] font-medium text-slate-400">
+      <div className="flex md:hidden items-center justify-between gap-1 mt-2.5 pt-2 border-t border-slate-800/60 overflow-x-auto text-[11px] font-medium text-slate-400 no-scrollbar">
         <button
           onClick={() => setActiveTab('dashboard')}
-          className={`py-1 px-2.5 rounded-md whitespace-nowrap ${activeTab === 'dashboard' ? 'text-emerald-400 bg-slate-800 font-semibold' : ''}`}
+          className={`py-1 px-2 rounded-md whitespace-nowrap ${activeTab === 'dashboard' ? 'text-emerald-400 bg-slate-800 font-semibold' : ''}`}
         >
           Earnings
         </button>
         <button
           onClick={() => setActiveTab('widgets')}
-          className={`py-1 px-2.5 rounded-md whitespace-nowrap ${activeTab === 'widgets' ? 'text-emerald-400 bg-slate-800 font-semibold' : ''}`}
+          className={`py-1 px-2 rounded-md whitespace-nowrap ${activeTab === 'widgets' ? 'text-emerald-400 bg-slate-800 font-semibold' : ''}`}
         >
-          iOS Widgets
+          Widgets
         </button>
         <button
           onClick={() => setActiveTab('calendar')}
-          className={`py-1 px-2.5 rounded-md whitespace-nowrap ${activeTab === 'calendar' ? 'text-emerald-400 bg-slate-800 font-semibold' : ''}`}
+          className={`py-1 px-2 rounded-md whitespace-nowrap ${activeTab === 'calendar' ? 'text-emerald-400 bg-slate-800 font-semibold' : ''}`}
         >
           Leaves
         </button>
         <button
           onClick={() => setActiveTab('settings')}
-          className={`py-1 px-2.5 rounded-md whitespace-nowrap ${activeTab === 'settings' ? 'text-emerald-400 bg-slate-800 font-semibold' : ''}`}
+          className={`py-1 px-2 rounded-md whitespace-nowrap ${activeTab === 'settings' ? 'text-emerald-400 bg-slate-800 font-semibold' : ''}`}
         >
           Salary
+        </button>
+        <button
+          onClick={onOpenExportModal}
+          className="py-1 px-2 rounded-md whitespace-nowrap text-emerald-300 font-bold bg-emerald-500/15 border border-emerald-500/40 flex items-center gap-1 active:scale-95"
+          title="Open Mobile Center (Download APK / IPA)"
+        >
+          <Smartphone className="w-3 h-3" />
+          <span>APK / IPA</span>
         </button>
       </div>
     </header>

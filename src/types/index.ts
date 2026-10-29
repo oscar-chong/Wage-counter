@@ -2,7 +2,7 @@ export type SalaryType = 'hourly' | 'monthly' | 'yearly';
 
 export type BonusType = 'percentage' | 'fixed';
 
-export type LeaveType = 'annual' | 'special' | 'holiday';
+export type LeaveType = 'annual' | 'special' | 'holiday' | 'unemployed';
 
 export type ActivityType = 'toilet' | 'lunch' | 'overtime';
 

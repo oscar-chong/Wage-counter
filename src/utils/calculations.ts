@@ -188,10 +188,15 @@ export function calculateDayEarnings(
   let baseEarned = 0;
   let bonusEarned = 0;
 
-  const isWorkDay = daySchedule.isWorkDay && (!leave || leave.isPaid);
+  const isWorkDay = daySchedule.isWorkDay && (!leave || (leave.isPaid && leave.type !== 'unemployed'));
 
   if (leave) {
-    if (leave.isPaid) {
+    if (leave.type === 'unemployed') {
+      // Unemployed day: strictly 0 hours, $0 earnings, non-work day
+      baseEarned = 0;
+      bonusEarned = 0;
+      workedSecondsToday = 0;
+    } else if (leave.isPaid) {
       // Paid leave (e.g. Paid Annual Leave / Paid Holiday) gets full scheduled day earnings
       baseEarned = scheduledWorkHours * baseHourly;
       bonusEarned = scheduledWorkHours * (bonusPerSecondRate * 3600);
@@ -292,7 +297,7 @@ export function calculateDayEarnings(
     lunchImpact,
     bonusEarned,
     netEarned,
-    scheduledWorkHours,
+    scheduledWorkHours: leave?.type === 'unemployed' ? 0 : scheduledWorkHours,
     workedSecondsToday,
     isWorkDay,
     leaveStatus: leave,

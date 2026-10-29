@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
+import { DashboardInstallBanner } from './components/DashboardInstallBanner';
 import { HeroEarnings } from './components/HeroEarnings';
 import { QuickBreakTracker } from './components/QuickBreakTracker';
 import { LogsTimeline } from './components/LogsTimeline';
@@ -130,6 +131,11 @@ export default function App() {
               onRecordSnapshot={handleRecordSnapshot}
             />
 
+            {/* Direct Mobile App & APK Download Quick Banner */}
+            <DashboardInstallBanner
+              onOpenExportModal={() => setIsExportModalOpen(true)}
+            />
+
             {/* Quick Action Triggers for Toilet, Lunch, and Overtime */}
             <QuickBreakTracker
               config={config}
@@ -236,6 +242,7 @@ export default function App() {
         onClose={() => setIsExportModalOpen(false)}
         config={config}
         schedules={schedules}
+        leaves={leaves}
       />
     </div>
   );

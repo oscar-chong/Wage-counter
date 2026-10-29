@@ -96,7 +96,11 @@ export function generateReportData(
 
     let status = 'Work Day';
     if (dayStats.leaveStatus) {
-      status = `${dayStats.leaveStatus.type.toUpperCase()}: ${dayStats.leaveStatus.title}`;
+      if (dayStats.leaveStatus.type === 'unemployed') {
+        status = `UNEMPLOYED: ${dayStats.leaveStatus.title || 'Gap / No Work'}`;
+      } else {
+        status = `${dayStats.leaveStatus.type.toUpperCase()}: ${dayStats.leaveStatus.title}`;
+      }
     } else if (!dayStats.isWorkDay) {
       status = 'Rest Day';
     }

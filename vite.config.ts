@@ -1,12 +1,29 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import { defineConfig } from 'vite';
+import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
-    base: '/Wage-counter/', // Moved inside the return block where Vite expects it
-    plugins: [react(), tailwindcss()],
+    base: './',
+    plugins: [
+      react(),
+      tailwindcss(),
+      {
+        name: 'apk-mime-middleware',
+        configureServer(server) {
+          server.middlewares.use((req, res, next) => {
+            if (req.url && req.url.includes('WageTicker.apk')) {
+              res.setHeader('Content-Type', 'application/vnd.android.package-archive');
+              res.setHeader('Content-Disposition', 'attachment; filename="WageTicker.apk"');
+            } else if (req.url && req.url.includes('manifest.webmanifest')) {
+              res.setHeader('Content-Type', 'application/manifest+json');
+            }
+            next();
+          });
+        },
+      },
+    ],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

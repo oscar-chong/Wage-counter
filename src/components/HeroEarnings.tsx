@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ChevronDown,
   Clock,
@@ -45,6 +45,24 @@ export const HeroEarnings: React.FC<HeroEarningsProps> = ({
   const [selectedPeriod, setSelectedPeriod] = useState<DisplayPeriod>(loadSelectedPeriod);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSnapshotRecorded, setIsSnapshotRecorded] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click/touch reliably
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   const [currentEarnings, setCurrentEarnings] = useState({
     amount: 0,
@@ -158,26 +176,28 @@ export const HeroEarnings: React.FC<HeroEarningsProps> = ({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl border p-6 sm:p-8 shadow-2xl transition-all duration-300 ${
+      className={`relative rounded-3xl border p-6 sm:p-8 shadow-2xl transition-all duration-300 ${
         isLossMode
           ? 'bg-gradient-to-b from-rose-950/60 via-slate-900/95 to-slate-950 border-rose-500/50 shadow-rose-950/40'
           : 'bg-gradient-to-b from-slate-900/90 to-slate-950/90 border-slate-800/80 shadow-emerald-950/20'
       }`}
     >
-      {/* Background ambient lighting */}
-      <div
-        className={`absolute -top-24 -right-24 w-80 h-80 rounded-full blur-3xl pointer-events-none ${
-          isLossMode ? 'bg-rose-500/20' : 'bg-emerald-500/10'
-        }`}
-      />
-      <div
-        className={`absolute -bottom-24 -left-24 w-80 h-80 rounded-full blur-3xl pointer-events-none ${
-          isLossMode ? 'bg-red-600/15' : 'bg-teal-500/10'
-        }`}
-      />
+      {/* Background ambient lighting enclosed in overflow-hidden wrapper so glows don't leak */}
+      <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
+        <div
+          className={`absolute -top-24 -right-24 w-80 h-80 rounded-full blur-3xl ${
+            isLossMode ? 'bg-rose-500/20' : 'bg-emerald-500/10'
+          }`}
+        />
+        <div
+          className={`absolute -bottom-24 -left-24 w-80 h-80 rounded-full blur-3xl ${
+            isLossMode ? 'bg-red-600/15' : 'bg-teal-500/10'
+          }`}
+        />
+      </div>
 
-      {/* Header with recordable dropdown selector */}
-      <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/60 pb-5">
+      {/* Header with recordable dropdown selector - elevated z-40 layer above live counter */}
+      <div className="relative z-40 flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/60 pb-5">
         <div className="flex flex-wrap items-center gap-2.5">
           {isLossMode ? (
             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold animate-pulse">
@@ -206,8 +226,9 @@ export const HeroEarnings: React.FC<HeroEarningsProps> = ({
         <div className="flex items-center gap-2">
           {/* Record / Snapshot Current Display Amount */}
           <button
+            type="button"
             onClick={handleTakeSnapshot}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all active:scale-95 shadow-sm ${
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all active:scale-95 shadow-sm cursor-pointer ${
               isSnapshotRecorded
                 ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-bold'
                 : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700'
@@ -228,13 +249,17 @@ export const HeroEarnings: React.FC<HeroEarningsProps> = ({
           </button>
 
           {/* The required recordable dropdown selector */}
-          <div className="relative">
+          <div className="relative z-[90]" ref={dropdownRef}>
             <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`flex items-center gap-2.5 px-4 py-2 border rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-md active:scale-95 cursor-pointer ${
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsDropdownOpen(!isDropdownOpen);
+              }}
+              className={`flex items-center gap-2.5 px-4 py-2 border rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-md active:scale-95 cursor-pointer relative z-[91] ${
                 isLossMode
-                  ? 'bg-rose-950/70 hover:bg-rose-900/80 text-rose-200 border-rose-500/60'
-                  : 'bg-slate-800/90 hover:bg-slate-750 text-slate-100 border-slate-700/80'
+                  ? 'bg-rose-950/90 hover:bg-rose-900 text-rose-200 border-rose-500/70'
+                  : 'bg-slate-800/95 hover:bg-slate-750 text-slate-100 border-slate-700'
               }`}
               aria-haspopup="true"
               aria-expanded={isDropdownOpen}
@@ -248,48 +273,45 @@ export const HeroEarnings: React.FC<HeroEarningsProps> = ({
             </button>
 
             {isDropdownOpen && (
-              <>
-                {/* Click outside backdrop */}
-                <div
-                  className="fixed inset-0 z-20"
-                  onClick={() => setIsDropdownOpen(false)}
-                />
-                <div className="absolute right-0 mt-2 w-72 z-30 rounded-2xl bg-slate-900 border border-slate-700/90 shadow-2xl p-1.5 backdrop-blur-xl animate-in fade-in zoom-in-95">
-                  <div className="px-3 py-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
-                    Select Display Period & Balance
-                  </div>
-                  {periodOptions.map((option) => (
-                    <button
-                      key={option.id}
-                      onClick={() => handlePeriodSelect(option.id)}
-                      className={`w-full text-left px-3 py-2.5 rounded-xl text-xs transition-colors flex flex-col gap-0.5 ${
-                        selectedPeriod === option.id
-                          ? option.isLoss
-                            ? 'bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40'
-                            : 'bg-emerald-500/15 text-emerald-300 font-semibold border border-emerald-500/30'
-                          : option.isLoss
-                          ? 'text-rose-400 hover:bg-rose-950/40'
-                          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                      }`}
-                    >
-                      <span className="flex items-center gap-1.5">
-                        {option.isLoss && <AlertTriangle className="w-3 h-3 text-rose-400" />}
-                        <span>{option.label}</span>
-                      </span>
-                      <span className="text-[10px] text-slate-400 font-normal">
-                        {option.sub}
-                      </span>
-                    </button>
-                  ))}
+              <div className="absolute right-0 mt-2 w-72 sm:w-80 z-[100] rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl p-1.5 backdrop-blur-2xl ring-1 ring-white/10 animate-in fade-in zoom-in-95 pointer-events-auto">
+                <div className="px-3 py-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase border-b border-slate-800/80 mb-1">
+                  Select Display Period & Balance
                 </div>
-              </>
+                {periodOptions.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePeriodSelect(option.id);
+                    }}
+                    className={`w-full text-left px-3 py-2.5 rounded-xl text-xs transition-colors flex flex-col gap-0.5 cursor-pointer pointer-events-auto ${
+                      selectedPeriod === option.id
+                        ? option.isLoss
+                          ? 'bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40'
+                          : 'bg-emerald-500/15 text-emerald-300 font-semibold border border-emerald-500/30'
+                        : option.isLoss
+                        ? 'text-rose-400 hover:bg-rose-950/50'
+                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                    }`}
+                  >
+                    <span className="flex items-center gap-1.5">
+                      {option.isLoss && <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />}
+                      <span className="font-semibold">{option.label}</span>
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-normal">
+                      {option.sub}
+                    </span>
+                  </button>
+                ))}
+              </div>
             )}
           </div>
         </div>
       </div>
 
       {/* Large Money Display: Always shows ONE amount only */}
-      <div className="relative z-10 py-6 sm:py-8 flex flex-col items-center justify-center text-center">
+      <div className="relative z-0 py-6 sm:py-8 flex flex-col items-center justify-center text-center">
         <div className="text-xs uppercase tracking-widest text-slate-400 font-medium mb-1.5 flex items-center gap-1.5">
           {isLossMode ? (
             <>

@@ -29,6 +29,7 @@ export const WidgetSimulator: React.FC<WidgetSimulatorProps> = ({
   onTriggerQuickBreak,
   onOpenExportModal,
 }) => {
+  const [platform, setPlatform] = useState<'ios' | 'android'>('ios');
   const [size, setSize] = useState<WidgetSize>('medium');
   const [period, setPeriod] = useState<DisplayPeriod>('day');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -119,79 +120,118 @@ export const WidgetSimulator: React.FC<WidgetSimulatorProps> = ({
           <div className="flex items-center gap-2">
             <Smartphone className="w-5 h-5 text-emerald-400" />
             <h3 className="text-base font-bold text-white">
-              iOS Home Screen & Lock Screen Widget Simulator
+              {platform === 'ios' ? 'Apple iOS WidgetKit Simulator' : 'Android Material You Widget Simulator'}
             </h3>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
-            Preview how your real-time earnings widget looks on iOS 16, 17, and 18 with WidgetKit.
+            {platform === 'ios'
+              ? 'Preview real-time earnings widgets on iOS 16, 17, and 18 Home Screen & Lock Screen.'
+              : 'Preview real-time earnings AppWidgets on Android 12, 13, 14, and 15 Home Screen.'}
           </p>
         </div>
 
-        {/* Widget Size Selector */}
-        <div className="flex items-center gap-1.5 p-1 bg-slate-950/80 rounded-xl border border-slate-800">
-          <button
-            onClick={() => setSize('small')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              size === 'small'
-                ? 'bg-emerald-500 text-slate-950 shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Small (2x2)
-          </button>
-          <button
-            onClick={() => setSize('medium')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              size === 'medium'
-                ? 'bg-emerald-500 text-slate-950 shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Medium (4x2)
-          </button>
-          <button
-            onClick={() => setSize('large')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              size === 'large'
-                ? 'bg-emerald-500 text-slate-950 shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Large (4x4)
-          </button>
-          <button
-            onClick={() => setSize('lockscreen')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              size === 'lockscreen'
-                ? 'bg-emerald-500 text-slate-950 shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Lock Screen
-          </button>
+        {/* Platform & Widget Size Selector */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* OS Switcher */}
+          <div className="flex items-center p-1 bg-slate-950/80 rounded-xl border border-slate-800 text-xs font-bold">
+            <button
+              onClick={() => setPlatform('ios')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                platform === 'ios'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>🍏</span>
+              <span>iOS</span>
+            </button>
+            <button
+              onClick={() => setPlatform('android')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                platform === 'android'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>🤖</span>
+              <span>Android</span>
+            </button>
+          </div>
+
+          {/* Size Selector */}
+          <div className="flex items-center gap-1.5 p-1 bg-slate-950/80 rounded-xl border border-slate-800">
+            <button
+              onClick={() => setSize('small')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                size === 'small'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Small (2x2)
+            </button>
+            <button
+              onClick={() => setSize('medium')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                size === 'medium'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Medium (4x2)
+            </button>
+            {platform === 'ios' && (
+              <>
+                <button
+                  onClick={() => setSize('large')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    size === 'large'
+                      ? 'bg-emerald-500 text-slate-950 shadow-md'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Large (4x4)
+                </button>
+                <button
+                  onClick={() => setSize('lockscreen')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    size === 'lockscreen'
+                      ? 'bg-emerald-500 text-slate-950 shadow-md'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Lock Screen
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Realistic iPhone Screen Showcase */}
       <div className="relative mx-auto max-w-md w-full rounded-[44px] p-4 bg-gradient-to-b from-slate-900 via-[#0e1628] to-slate-950 border-[6px] border-slate-800 shadow-2xl shadow-emerald-950/40 min-h-[580px] flex flex-col justify-between overflow-hidden">
-        {/* Dynamic Island / Notch */}
-        <div className="mx-auto w-32 h-6 bg-black rounded-full mb-3 flex items-center justify-between px-3 text-[10px] text-white">
-          <div className="w-2.5 h-2.5 rounded-full bg-slate-800" />
-          {activeActivity ? (
-            <span className="text-[10px] text-emerald-400 font-mono animate-pulse">
-              {activeActivity === 'toilet' ? '🚽 12m' : '⚡ Live'}
-            </span>
-          ) : (
-            <span className="text-[9px] text-slate-500 font-mono">9:41</span>
-          )}
-          <div className="w-2 h-2 rounded-full bg-blue-500/80" />
-        </div>
+        {/* Device Camera / Notch */}
+        {platform === 'ios' ? (
+          <div className="mx-auto w-32 h-6 bg-black rounded-full mb-3 flex items-center justify-between px-3 text-[10px] text-white">
+            <div className="w-2.5 h-2.5 rounded-full bg-slate-800" />
+            {activeActivity ? (
+              <span className="text-[10px] text-emerald-400 font-mono animate-pulse">
+                {activeActivity === 'toilet' ? '🚽 12m' : '⚡ Live'}
+              </span>
+            ) : (
+              <span className="text-[9px] text-slate-500 font-mono">9:41</span>
+            )}
+            <div className="w-2 h-2 rounded-full bg-blue-500/80" />
+          </div>
+        ) : (
+          <div className="mx-auto w-3.5 h-3.5 bg-black rounded-full mb-2 border border-slate-800 shadow-inner" />
+        )}
 
-        {/* iPhone Status Bar */}
+        {/* Status Bar */}
         <div className="flex items-center justify-between px-4 text-xs font-semibold text-slate-300">
-          <span>9:41</span>
+          <span>{platform === 'android' ? '10:00' : '9:41'}</span>
           <div className="flex items-center gap-1.5 text-[11px]">
-            <span>5G</span>
+            {platform === 'android' ? <span>5G UW</span> : <span>5G</span>}
             <span>100%</span>
             <div className="w-5 h-2.5 rounded-sm border border-slate-400 p-0.5 flex items-center">
               <div className="w-full h-full bg-emerald-400 rounded-2xs" />
@@ -507,24 +547,24 @@ export const WidgetSimulator: React.FC<WidgetSimulatorProps> = ({
         <div className="w-32 h-1 bg-white/40 rounded-full mx-auto mt-2" />
       </div>
 
-      {/* Action banner to export real iOS widget code */}
+      {/* Action banner to export real iOS / Android widget code */}
       <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-500/30 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Ready to install this widget on your physical iPhone?</span>
+            <span>Ready to install this widget on your iPhone or Android?</span>
           </h4>
           <p className="text-xs text-slate-400 mt-0.5">
-            Download the ready-to-sign .IPA package, complete Swift/WidgetKit code, or run in 2 minutes via Scriptable!
+            Download the 100% offline WageTicker.apk for Android or WageTicker.ipa for iPhone to add widgets to your Home Screen!
           </p>
         </div>
 
         <button
           onClick={onOpenExportModal}
-          className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
+          className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all active:scale-95 cursor-pointer"
         >
           <Download className="w-4 h-4" />
-          <span>Get .IPA & Widget Code</span>
+          <span>Download App (APK / .IPA)</span>
         </button>
       </div>
     </div>

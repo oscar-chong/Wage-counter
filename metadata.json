@@ -1,6 +1,6 @@
 {
   "name": "iOS Real-Time Earnings & Widget",
   "description": "Real-time salary counter, iOS widget companion & exporter, schedule, leave calendar, break tracker, and daily report generator.",
-  "requestFramePermissions": [],
+ "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
